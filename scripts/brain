@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# brain — small helper for the second brain in this folder.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TODAY="$(date +%F)"
+
+usage() {
+  cat <<'USAGE'
+brain — second brain helper
+
+  brain search <query>     Search the brain, memory and inbox (case-insensitive)
+  brain today              Open/create today's log file path
+  brain log <text>         Append a timestamped line to today's log
+  brain person <name>      Create a person file from the template
+  brain project <name>     Create a project file from the template
+  brain todos              List every unfilled TODO in the brain
+  brain stale [days]       Files not modified in N days (default 90)
+  brain stats              How full the brain is
+  brain backup             Timestamped snapshot into private/backups/
+USAGE
+}
+
+slug() { echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//'; }
+
+cmd="${1:-help}"; shift || true
+
+case "$cmd" in
+  search)
+    [ $# -gt 0 ] || { echo "usage: brain search <query>" >&2; exit 1; }
+    grep -rin --color=always \
+         --exclude-dir=.git --exclude-dir=backups --exclude=.DS_Store --exclude='_template.md' \
+         -- "$*" "$ROOT/brain" "$ROOT/memory" "$ROOT/inbox" 2>/dev/null \
+      | sed "s|$ROOT/||" || echo "No matches for: $*"
+    ;;
+
+  today)
+    f="$ROOT/memory/log/$TODAY.md"
+    [ -f "$f" ] || printf '# %s\n\n## Done\n\n## Learned\n\n## Decided\n\n## Loose ends\n' "$TODAY" > "$f"
+    echo "$f"
+    ;;
+
+  log)
+    [ $# -gt 0 ] || { echo "usage: brain log <text>" >&2; exit 1; }
+    f="$("$0" today)"
+    awk -v line="- $(date +%H:%M) — $*" '
+      /^## Done$/ { print; print ""; print line; done=1; next }
+      { print }
+    ' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
+    echo "logged → memory/log/$TODAY.md"
+    ;;
+
+  person)
+    [ $# -gt 0 ] || { echo "usage: brain person <name> [family|work]" >&2; exit 1; }
+    name="$1"; area="${2:-work}"
+    f="$ROOT/brain/people/$area/$(slug "$name").md"
+    [ -f "$f" ] && { echo "exists: ${f#$ROOT/}"; exit 0; }
+    sed "s/<Full Name>/$name/" "$ROOT/brain/people/_template.md" > "$f"
+    echo "created: ${f#$ROOT/}"
+    ;;
+
+  project)
+    [ $# -gt 0 ] || { echo "usage: brain project <name>" >&2; exit 1; }
+    f="$ROOT/brain/work/projects/$(slug "$1").md"
+    [ -f "$f" ] && { echo "exists: ${f#$ROOT/}"; exit 0; }
+    sed "s/<Project Name>/$1/" "$ROOT/brain/work/projects/_template.md" > "$f"
+    echo "created: ${f#$ROOT/}"
+    ;;
+
+  todos)
+    grep -rn "TODO" "$ROOT/brain" --exclude='_template.md' 2>/dev/null \
+      | sed "s|$ROOT/||" | sort || echo "No TODOs left. Suspicious."
+    ;;
+
+  stale)
+    days="${1:-90}"
+    echo "Not touched in $days+ days:"
+    find "$ROOT/brain" -name '*.md' -mtime "+$days" 2>/dev/null \
+      | sed "s|$ROOT/||" | sort || true
+    ;;
+
+  stats)
+    files=$(find "$ROOT/brain" -name '*.md' ! -name '_template.md' | wc -l | tr -d ' ')
+    todos=$(grep -rc "TODO" "$ROOT/brain" --exclude='_template.md' 2>/dev/null \
+            | awk -F: '{s+=$2} END {print s+0}')
+    people=$(find "$ROOT/brain/people" -name '*.md' ! -name '_template.md' ! -name 'directory.md' | wc -l | tr -d ' ')
+    projects=$(find "$ROOT/brain/work/projects" -name '*.md' ! -name '_template.md' | wc -l | tr -d ' ')
+    logs=$(find "$ROOT/memory/log" -name '*.md' ! -name 'README.md' | wc -l | tr -d ' ')
+    inbox=$(find "$ROOT/inbox" -type f ! -name 'README.md' | wc -l | tr -d ' ')
+    printf 'brain files : %s\nunfilled    : %s TODOs\npeople      : %s\nprojects    : %s\nlog days    : %s\ninbox       : %s waiting\n' \
+      "$files" "$todos" "$people" "$projects" "$logs" "$inbox"
+    ;;
+
+  backup)
+    dest="$ROOT/private/backups"
+    mkdir -p "$dest"
+    out="$dest/brain-$(date +%Y%m%d-%H%M%S).tar.gz"
+    tar -czf "$out" -C "$ROOT" brain memory CLAUDE.md 2>/dev/null
+    echo "backed up → ${out#$ROOT/} ($(du -h "$out" | cut -f1))"
+    ls -1t "$dest"/brain-*.tar.gz 2>/dev/null | tail -n +11 | xargs -r rm -f
+    ;;
+
+  help|--help|-h) usage ;;
+  *) echo "unknown command: $cmd" >&2; usage >&2; exit 1 ;;
+esac

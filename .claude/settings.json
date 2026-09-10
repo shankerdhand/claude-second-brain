@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./scripts/brain:*)",
+      "Bash(scripts/brain:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(date:*)",
+      "Edit(./brain/**)",
+      "Edit(./memory/**)",
+      "Edit(./inbox/**)"
+    ],
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}

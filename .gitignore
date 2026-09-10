@@ -1,0 +1,8 @@
+# Never leave the machine
+private/
+inbox/*
+!inbox/README.md
+.DS_Store
+
+# Backups
+*.tar.gz
