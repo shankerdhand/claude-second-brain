@@ -1,0 +1,78 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4EFE6; --ink:#1C1B19; --muted:#6B665E; --line:#DDD5C7;
+    --teal:#1F6F66; --teal-soft:#DCEBE7; --amber:#B7791F; --rose:#B4534B; --card:#FFFDF9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1280px;height:640px;overflow:hidden}
+  body{background:var(--paper);color:var(--ink);font-family:Inter,-apple-system,"Helvetica Neue",Arial,sans-serif;
+       position:relative}
+  /* faint ruled-notebook lines */
+  body::before{content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(to bottom,transparent 0 39px,rgba(28,27,25,.045) 39px 40px);}
+  .wrap{position:relative;display:grid;grid-template-columns:1fr 470px;gap:64px;height:100%;padding:72px 76px 64px}
+  .eyebrow{font:600 15px/1 Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);
+           display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:26px;height:2px;background:var(--teal)}
+  h1{font-family:Fraunces,"Iowan Old Style",Georgia,serif;font-weight:600;font-size:76px;line-height:1.02;
+     letter-spacing:-.02em;margin:26px 0 22px}
+  h1 em{font-style:normal;color:var(--teal)}
+  .sub{font-size:23px;line-height:1.45;color:#3D3A35;max-width:560px}
+  .chips{display:flex;flex-wrap:nowrap;gap:10px;margin-top:32px}
+  .chip{font:500 16px/1 "JetBrains Mono",Menlo,monospace;padding:9px 12px;border:1.5px solid var(--line);
+        border-radius:8px;background:rgba(255,253,249,.7);color:var(--ink);white-space:nowrap}
+  .chip.more{border-style:dashed;color:var(--muted);background:transparent;font-family:Inter,sans-serif;font-weight:500}
+  .foot{position:absolute;left:76px;bottom:52px;font:400 18px/1 "JetBrains Mono",Menlo,monospace;color:var(--muted);
+        display:flex;gap:18px;align-items:center}
+  .foot b{color:var(--ink);font-weight:500}
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--line)}
+
+  /* right: the assistant card */
+  .card{align-self:center;background:var(--card);border:1px solid var(--line);border-radius:18px;
+        box-shadow:0 1px 0 rgba(0,0,0,.03),0 24px 48px -20px rgba(60,45,20,.28);overflow:hidden;margin-top:-18px}
+  .ask{display:flex;justify-content:flex-end;padding:22px 22px 6px}
+  .bubble{background:var(--teal);color:#fff;font-size:18px;font-weight:500;padding:11px 16px;border-radius:16px 16px 4px 16px}
+  .brief{padding:14px 24px 22px}
+  .hello{font-family:Fraunces,Georgia,serif;font-size:21px;font-weight:500;line-height:1.35;margin-bottom:14px}
+  .row{display:grid;grid-template-columns:106px 1fr;gap:12px;align-items:baseline;padding:10px 0;border-top:1px dashed var(--line)}
+  .tag{font:600 11.5px/1 Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:7px;white-space:nowrap}
+  .tag i{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .txt{font-size:16.5px;line-height:1.35;color:#2C2A26}
+  .txt s{text-decoration:none;color:var(--muted)}
+  .file{display:flex;align-items:center;gap:8px;padding:11px 24px;background:#F8F4EC;border-top:1px solid var(--line);
+        font:400 13.5px/1 "JetBrains Mono",Menlo,monospace;color:var(--muted)}
+  .file i{width:9px;height:11px;border:1.5px solid var(--muted);border-radius:2px;display:inline-block}
+</style></head>
+<body><div class="wrap">
+  <div>
+    <div class="eyebrow">Open-source template for Claude Code</div>
+    <h1>Your second brain,<br><em>run by Claude.</em></h1>
+    <p class="sub">People, work, routines and important dates in plain Markdown, plus skills that brief you, remember for you, and write in your voice.</p>
+    <div class="chips">
+      <span class="chip">/daily-brief</span><span class="chip">/remember</span><span class="chip">/draft-letter</span>
+      <span class="chip more">+8 more skills</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ask"><div class="bubble">Mona, what's on today?</div></div>
+    <div class="brief">
+      <p class="hello">Good morning. Three calls, all afternoon; the morning is free.</p>
+      <div class="row"><span class="tag" style="color:var(--rose)"><i style="background:var(--rose)"></i>Needs you</span>
+        <span class="txt">Invoice #204 is 12 days overdue. <s>Reminder drafted.</s></span></div>
+      <div class="row"><span class="tag" style="color:var(--teal)"><i style="background:var(--teal)"></i>Calendar</span>
+        <span class="txt">14:00 Ravi, pricing call. <s>Prep: pushed on price before.</s></span></div>
+      <div class="row"><span class="tag" style="color:var(--amber)"><i style="background:var(--amber)"></i>Waiting</span>
+        <span class="txt">6 days on the landlord for the lease. <s>Nudge?</s></span></div>
+      <div class="row"><span class="tag" style="color:#5B5FA8"><i style="background:#5B5FA8"></i>Coming up</span>
+        <span class="txt">Mum's birthday in 6 days. <s>You usually book dinner.</s></span></div>
+    </div>
+    <div class="file"><i></i>memory/log/today.md · updated just now</div>
+  </div>
+</div>
+<div class="foot"><b>github.com/shankerdhand/claude-second-brain</b><span class="dot"></span>MIT<span class="dot"></span>Use this template</div>
+</body></html>
